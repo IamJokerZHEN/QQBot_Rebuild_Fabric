@@ -1,12 +1,12 @@
 # Fabric
 
-与 [BotServer](https://github.com/Minecraft-QQBot/BotServer) 进行对接的 Fabirc mod。
+与 [BotServer](https://github.com/IamJokerZHEN/BotServerRebuild) 进行对接的 Fabirc mod。
 
-你可以到 [Releases](https://github.com/Minecraft-QQBot/Fabric/releases) 下载最新版本 Fabric 服务器插件。
+你可以到 [Releases](https://github.com/IamJokerZHEN/QQBot_Fabric/releases) 下载最新版本 Fabric 服务器插件。
 
 ## 功能
 
-- 与BotServer项目联动
+- 与 [BotServer](https://github.com/IamJokerZHEN/BotServerRebuild) 项目联动
 
 ## 安装插件
 
@@ -20,7 +20,7 @@
   "reconnect_interval": 5
 }
 ```
-
+## 修改By JokerZHEN
 其中各个字段的含义如下：
 
 |        字段名         | 类型  |                  含义                   |
