@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10.1'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -38,6 +38,7 @@ dependencies {
     //mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation include('org.java-websocket:Java-WebSocket:1.6.0')
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 processResources {

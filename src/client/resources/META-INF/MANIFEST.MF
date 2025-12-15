@@ -1,0 +1,96 @@
+Manifest-Version: 1.0
+Main-Class: org.minecralogy.qqbot.Bot
+Class-Path: fabric-screen-api-v1-client-2.0.24+b5597344d1.jar icu4j-73.2
+ .jar blocklist-1.0.10.jar fabric-item-group-api-v1-client-4.1.4+7801727
+ 0d1.jar log4j-core-2.22.1.jar fabric-renderer-indigo-client-1.7.0+c705a
+ 49cd1.jar fabric-resource-loader-v0-client-1.3.0+56599129d1.jar netty-c
+ odec-4.1.97.Final.jar fabric-item-api-v1-common-11.0.0+afdfc921d1.jar f
+ abric-sound-api-v1-client-1.0.23+6573ed8cd1.jar fabric-renderer-registr
+ ies-v1-client-3.2.68+df3654b3d1.jar netty-transport-native-unix-common-
+ 4.1.97.Final.jar guava-32.1.2-jre.jar fabric-loot-api-v2-common-3.0.14+
+ 3f89f5a5d1.jar lwjgl-3.3.3-natives-windows-arm64.jar mappings.jar lwjgl
+ -freetype-3.3.3-natives-windows-arm64.jar lwjgl-3.3.3-natives-windows-x
+ 86.jar fabric-command-api-v2-client-2.2.28+6ced4dd9d1.jar fabric-loader
+ -0.16.10.jar fabric-item-group-api-v1-common-4.1.4+78017270d1.jar lwjgl
+ -glfw-3.3.3-natives-windows-arm64.jar sponge-mixin-0.15.4+mixin.0.8.7.j
+ ar joml-1.10.5.jar fabric-api-common-0.102.0+1.21.jar fabric-rendering-
+ v0-client-1.1.71+df3654b3d1.jar lwjgl-jemalloc-3.3.3.jar lwjgl-freetype
+ -3.3.3-natives-windows-x86.jar commons-codec-1.16.0.jar httpclient-4.5.
+ 13.jar commons-io-2.15.1.jar netty-handler-4.1.97.Final.jar text2speech
+ -1.17.9.jar lwjgl-tinyfd-3.3.3-natives-windows.jar fabric-convention-ta
+ gs-v2-common-2.5.0+c5e2b5c6d1.jar log4j-slf4j2-impl-2.22.1.jar fabric-g
+ ametest-api-v1-common-2.0.4+6fc22b99d1.jar oshi-core-6.4.10.jar asm-tre
+ e-9.7.1.jar fabric-message-api-v1-client-6.0.13+6573ed8cd1.jar lwjgl-gl
+ fw-3.3.3-natives-windows-x86.jar fabric-entity-events-v1-common-1.6.12+
+ 6fc22b99d1.jar fabric-api-lookup-api-v1-common-1.6.68+b5597344d1.jar fa
+ bric-rendering-data-attachment-v1-common-0.3.48+73761d2ed1.jar lwjgl-st
+ b-3.3.3-natives-windows.jar jline-reader-3.20.0.jar fabric-key-binding-
+ api-v1-client-1.0.47+0af3f5a7d1.jar gson-2.10.1.jar jorbis-0.0.17.jar s
+ lf4j-api-2.0.13.jar fabric-data-attachment-api-v1-common-1.1.27+6a6dfa1
+ 9d1.jar lwjgl-tinyfd-3.3.3.jar minecraft-clientOnly-c2b31d572c-1.21-net
+ .fabricmc.yarn.1_21.1.21+build.4-v2.jar lwjgl-stb-3.3.3.jar fabric-tran
+ sfer-api-v1-common-5.1.16+3dccd343d1.jar patchy-2.2.10.jar fabric-netwo
+ rking-api-v1-client-4.2.2+60c3209bd1.jar log4j-api-2.22.1.jar fabric-pa
+ rticles-v1-common-4.0.2+6573ed8cd1.jar fabric-transfer-api-v1-client-5.
+ 1.16+3dccd343d1.jar fabric-biome-api-v1-common-13.0.29+5bd9f1bcd1.jar f
+ abric-data-generation-api-v1-common-20.2.16+16c4ae25d1.jar fabric-crash
+ -report-info-v1-common-0.2.29+0af3f5a7d1.jar lwjgl-opengl-3.3.3.jar jop
+ t-simple-5.0.4.jar fabric-game-rule-api-v1-common-1.0.53+6ced4dd9d1.jar
+  failureaccess-1.0.1.jar commons-lang3-3.14.0.jar fabric-transitive-acc
+ ess-wideners-v1-common-6.1.0+176f9036d1.jar fabric-convention-tags-v1-c
+ ommon-2.0.19+7f945d5bd1.jar fabric-model-loading-api-v1-client-2.0.0+fe
+ 474d6bd1.jar fabric-events-interaction-v0-common-0.7.12+ba9dae06d1.jar 
+ jna-5.14.0.jar fabric-particles-v1-client-4.0.2+6573ed8cd1.jar logging-
+ 1.2.7.jar lz4-java-1.8.0.jar asm-util-9.7.1.jar fabric-rendering-fluids
+ -v1-client-3.1.6+b5597344d1.jar fabric-block-api-v1-common-1.0.22+0af3f
+ 5a7d1.jar fastutil-8.5.12.jar Java-WebSocket-1.6.0.jar lwjgl-openal-3.3
+ .3.jar fabric-data-attachment-api-v1-client-1.1.27+6a6dfa19d1.jar fabri
+ c-object-builder-api-v1-common-15.2.0+a551f7a4d1.jar fabric-object-buil
+ der-api-v1-client-15.2.0+a551f7a4d1.jar fabric-rendering-data-attachmen
+ t-v1-client-0.3.48+73761d2ed1.jar fabric-commands-v0-common-0.2.66+df36
+ 54b3d1.jar fabric-recipe-api-v1-common-5.0.12+65089712d1.jar lwjgl-open
+ gl-3.3.3-natives-windows.jar fabric-game-rule-api-v1-client-1.0.53+6ced
+ 4dd9d1.jar lwjgl-3.3.3-natives-windows.jar netty-transport-classes-epol
+ l-4.1.97.Final.jar fabric-rendering-fluids-v1-common-3.1.6+b5597344d1.j
+ ar fabric-block-view-api-v2-client-1.0.10+6573ed8cd1.jar fabric-resourc
+ e-conditions-api-v1-common-4.3.0+8dc279b1d1.jar lwjgl-tinyfd-3.3.3-nati
+ ves-windows-arm64.jar brigadier-1.2.9.jar lwjgl-opengl-3.3.3-natives-wi
+ ndows-arm64.jar fabric-api-base-common-0.4.42+6573ed8cd1.jar httpcore-4
+ .4.16.jar fabric-command-api-v1-common-1.2.49+f71b366fd1.jar fabric-blo
+ ck-view-api-v2-common-1.0.10+6573ed8cd1.jar lwjgl-openal-3.3.3-natives-
+ windows-x86.jar fabric-data-generation-api-v1-client-20.2.16+16c4ae25d1
+ .jar asm-9.7.1.jar fabric-command-api-v2-common-2.2.28+6ced4dd9d1.jar l
+ wjgl-freetype-3.3.3-natives-windows.jar commons-compress-1.26.0.jar fab
+ ric-loot-api-v3-common-1.0.2+3f89f5a5d1.jar jline-terminal-3.20.0.jar f
+ abric-screen-handler-api-v1-common-1.3.86+b5597344d1.jar lwjgl-stb-3.3.
+ 3-natives-windows-arm64.jar lwjgl-tinyfd-3.3.3-natives-windows-x86.jar 
+ fabric-lifecycle-events-v1-client-2.3.12+6c1df360d1.jar fabric-message-
+ api-v1-common-6.0.13+6573ed8cd1.jar fabric-entity-events-v1-client-1.6.
+ 12+6fc22b99d1.jar lwjgl-opengl-3.3.3-natives-windows-x86.jar asm-analys
+ is-9.7.1.jar netty-resolver-4.1.97.Final.jar fabric-rendering-v1-client
+ -5.0.5+df16efd0d1.jar fabric-item-api-v1-client-11.0.0+afdfc921d1.jar d
+ ev-launch-injector-0.2.1+build.8.jar lwjgl-openal-3.3.3-natives-windows
+ .jar lwjgl-freetype-3.3.3.jar mappings.jar fabric-events-interaction-v0
+ -client-0.7.12+ba9dae06d1.jar jna-platform-5.14.0.jar lwjgl-glfw-3.3.3.
+ jar commons-logging-1.2.jar netty-common-4.1.97.Final.jar asm-commons-9
+ .7.1.jar terminalconsoleappender-1.3.0.jar minecraft-common-c2b31d572c-
+ 1.21-net.fabricmc.yarn.1_21.1.21+build.4-v2.jar lwjgl-jemalloc-3.3.3-na
+ tives-windows-arm64.jar fabric-renderer-api-v1-client-3.4.0+c705a49cd1.
+ jar fabric-recipe-api-v1-client-5.0.12+65089712d1.jar fabric-resource-l
+ oader-v0-common-1.3.0+56599129d1.jar netty-transport-native-epoll-4.1.9
+ 7.Final-linux-aarch_64.jar fabric-client-tags-api-v1-client-1.1.15+6573
+ ed8cd1.jar lwjgl-openal-3.3.3-natives-windows-arm64.jar fabric-lifecycl
+ e-events-v1-common-2.3.12+6c1df360d1.jar fabric-screen-handler-api-v1-c
+ lient-1.3.86+b5597344d1.jar lwjgl-stb-3.3.3-natives-windows-x86.jar fab
+ ric-blockrenderlayer-v1-client-1.1.52+0af3f5a7d1.jar fabric-registry-sy
+ nc-v0-common-5.1.2+60c3209bd1.jar mappings.jar mixinextras-fabric-0.4.1
+ .jar fabric-content-registries-v0-common-8.0.16+b5597344d1.jar fabric-d
+ imensions-v1-common-4.0.0+6fc22b99d1.jar lwjgl-jemalloc-3.3.3-natives-w
+ indows-x86.jar datafixerupper-8.0.16.jar netty-transport-4.1.97.Final.j
+ ar netty-transport-native-epoll-4.1.97.Final-linux-x86_64.jar lwjgl-glf
+ w-3.3.3-natives-windows.jar fabric-networking-api-v1-common-4.2.2+60c32
+ 09bd1.jar netty-buffer-4.1.97.Final.jar lwjgl-jemalloc-3.3.3-natives-wi
+ ndows.jar authlib-6.0.54.jar fabric-registry-sync-v0-client-5.1.2+60c32
+ 09bd1.jar lwjgl-3.3.3.jar fabric-keybindings-v0-client-0.2.45+df3654b3d
+ 1.jar
+
