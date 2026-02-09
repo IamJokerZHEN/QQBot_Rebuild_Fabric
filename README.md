@@ -1,4 +1,4 @@
-# Fabric
+# QQBot:Rebuild Fabric
 
 与 [BotServer](https://github.com/IamJokerZHEN/BotServerRebuild) 进行对接的 Fabirc mod。
 
