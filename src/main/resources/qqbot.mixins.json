@@ -4,8 +4,8 @@
   "package": "org.minecralogy.qqbot.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerManagerMixin",
-    "ServerPlayerEntityMixin",
+    "PlayerListMixin",
+    "ServerPlayerMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
   "injectors": {

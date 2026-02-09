@@ -1,33 +1,30 @@
 package org.minecralogy.qqbot.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.argument.MessageArgumentType;
-import net.minecraft.network.message.SentMessage;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.arguments.MessageArgument;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.minecralogy.qqbot.Bot;
 import net.minecraft.server.MinecraftServer;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class QQCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("qq")
-                .then(CommandManager.argument("message", MessageArgumentType.message()).executes(context -> {
-                    MessageArgumentType.getSignedMessage(context, "message", message -> {
-                        String m = SentMessage.of(message).content().getString();
-                        String msg = String.format("[%s] <%s> %s", Bot.config.getName(), context.getSource().getName(), m);
-                        Bot.sender.sendSynchronousMessage(msg);
-                        System.out.println(msg);
+                .then(Commands.argument("message", MessageArgument.message()).executes(context -> {
+                    // ✅ 使用 MessageArgument.getMessage
+                    String m = MessageArgument.getMessage(context, "message").getString();
+                    String msg = String.format("[%s] <%s> %s", Bot.config.getName(), context.getSource().getTextName(), m);
+                    Bot.sender.sendSynchronousMessage(msg);
+                    System.out.println(msg);
 
-                        // 修复：通过ServerCommandSource获取服务器
-                        MinecraftServer server = context.getSource().getServer();
-                        // 修复：使用execute方法代替executeWithPrefix
-                        server.getCommandManager().execute(
-                                server.getCommandManager().getDispatcher().parse("say " + m, context.getSource()),
-                                "say " + m
-                        );
-                    });
+                    MinecraftServer server = context.getSource().getServer();
+                    // ✅ 正确执行 say 命令
+                    server.getCommands().performPrefixedCommand(
+                            context.getSource(),
+                            "say " + m
+                    );
                     return 1;
                 }))
         );

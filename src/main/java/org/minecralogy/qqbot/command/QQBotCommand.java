@@ -1,17 +1,22 @@
 package org.minecralogy.qqbot.command;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+
 import com.google.gson.Gson;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import me.lucko.fabric.api.permissions.v0.Permissions;  // ✅ Fabric Permissions API
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import org.minecralogy.qqbot.Bot;
 import org.minecralogy.qqbot.Config;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,12 +34,14 @@ public class QQBotCommand {
     private static final Path CONFIG_PATH = Paths.get("config/qq_bot.json");
     private static final int LOG_LINES = 15;
     private static final int INPUT_TIMEOUT = 60;
-    private static final Map<ServerCommandSource, CompletableFuture<String>> pendingInputs = new HashMap<>();
+    private static final Map<CommandSourceStack, CompletableFuture<String>> pendingInputs = new HashMap<>();
     private static final Gson gson = new Gson();
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("qqbot")
-                .requires(source -> source.hasPermissionLevel(2))
+                // ✅ 使用 Fabric Permissions API 检查权限
+                // 参数：权限节点字符串，默认权限级别（2=管理员）
+                .requires(source -> Permissions.check(source, "qqbot.command", 2))
                 .executes(QQBotCommand::showInfo)
                 .then(literal("reconnect")
                         .executes(QQBotCommand::reconnect)
@@ -70,8 +77,19 @@ public class QQBotCommand {
         );
     }
 
-    private static int updateConfigDirectly(CommandContext<ServerCommandSource> context, String key) {
-        ServerCommandSource source = context.getSource();
+    // ✅ 使用 Fabric Permissions API 进行权限检查
+    // 可以为不同子命令设置不同的权限节点
+    private static boolean hasPermission(CommandSourceStack source, int level) {
+        return Permissions.check(source, "qqbot.command", level);
+    }
+
+    // 也可以为特定子命令设置更细粒度的权限
+    private static boolean hasPermission(CommandSourceStack source, String permissionNode, int level) {
+        return Permissions.check(source, permissionNode, level);
+    }
+
+    private static int updateConfigDirectly(CommandContext<CommandSourceStack> context, String key) {
+        CommandSourceStack source = context.getSource();
         String value;
 
         try {
@@ -85,21 +103,21 @@ public class QQBotCommand {
                     value = String.valueOf(getInteger(context, "value"));
                     break;
                 default:
-                    source.sendError(Text.literal("未知的配置项"));
+                    source.sendFailure(Component.literal("未知的配置项"));
                     return 0;
             }
 
             updateConfig(key, value);
-            source.sendFeedback(() -> Text.literal(key + " 已更新为: " + value), true);
+            source.sendSuccess(() -> Component.literal(key + " 已更新为: " + value), true);
             return 1;
         } catch (Exception e) {
-            source.sendError(Text.literal("更新失败: " + e.getMessage()));
+            source.sendFailure(Component.literal("更新失败: " + e.getMessage()));
             return 0;
         }
     }
 
-    public static int reconnect(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    public static int reconnect(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         try {
             Bot.listener.close();
             Bot.sender.close();
@@ -107,43 +125,41 @@ public class QQBotCommand {
             Bot.listener = new Listener(Bot.getListenerUri());
             Bot.sender = new Sender(Bot.getSenderUri());
 
-            source.sendFeedback(() -> Text.literal("QQ Bot 重连成功"), true);
+            source.sendSuccess(() -> Component.literal("QQ Bot 重连成功"), true);
             return 1;
         } catch (Exception e) {
-            source.sendError(Text.literal("重连失败: " + e.getMessage()));
+            source.sendFailure(Component.literal("重连失败: " + e.getMessage()));
             return 0;
         }
     }
 
-
-    private static int showInfo(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int showInfo(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         Config config = Bot.config;
-        source.sendFeedback(() -> Text.literal("=== QQ Bot 状态 ==="), false);
-        source.sendFeedback(() -> Text.literal("WebSocket连接状态: " +
-                (Bot.listener.isConnected() ? "已连接" : "未连接")), false);  // 使用 isConnected()
-        source.sendFeedback(() -> Text.literal("当前URI: " + config.getUri()), false);
-        source.sendFeedback(() -> Text.literal("服务器名称: " + config.getName()), false);
+        source.sendSuccess(() -> Component.literal("=== QQ Bot 状态 ==="), false);
+        source.sendSuccess(() -> Component.literal("WebSocket连接状态: " +
+                (Bot.listener.isConnected() ? "已连接" : "未连接")), false);
+        source.sendSuccess(() -> Component.literal("当前URI: " + config.getUri()), false);
+        source.sendSuccess(() -> Component.literal("服务器名称: " + config.getName()), false);
         return 1;
     }
 
-
-    private static int showConfig(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int showConfig(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         Config config = Bot.config;
 
-        source.sendFeedback(() -> Text.literal("=== QQ Bot 配置 ==="), false);
-        source.sendFeedback(() -> Text.literal("WebSocket URI: " + config.getUri()), false);
-        source.sendFeedback(() -> Text.literal("名称: " + config.getName()), false);
-        source.sendFeedback(() -> Text.literal("Token: " + config.getToken()), false);
-        source.sendFeedback(() -> Text.literal("重连间隔: " + config.getReconnect_interval() + " 秒"), false);
+        source.sendSuccess(() -> Component.literal("=== QQ Bot 配置 ==="), false);
+        source.sendSuccess(() -> Component.literal("WebSocket URI: " + config.getUri()), false);
+        source.sendSuccess(() -> Component.literal("名称: " + config.getName()), false);
+        source.sendSuccess(() -> Component.literal("Token: " + config.getToken()), false);
+        source.sendSuccess(() -> Component.literal("重连间隔: " + config.getReconnect_interval() + " 秒"), false);
 
         return 1;
     }
 
-    private static int waitForInput(CommandContext<ServerCommandSource> context, String key) {
-        ServerCommandSource source = context.getSource();
-        source.sendFeedback(() -> Text.literal("请在" + INPUT_TIMEOUT + "秒内在聊天框输入新的" + key + "值"), false);
+    private static int waitForInput(CommandContext<CommandSourceStack> context, String key) {
+        CommandSourceStack source = context.getSource();
+        source.sendSuccess(() -> Component.literal("请在" + INPUT_TIMEOUT + "秒内在聊天框输入新的" + key + "值"), false);
 
         CompletableFuture<String> future = new CompletableFuture<>();
         pendingInputs.put(source, future);
@@ -152,12 +168,12 @@ public class QQBotCommand {
                 .whenComplete((value, throwable) -> {
                     pendingInputs.remove(source);
                     if (throwable instanceof TimeoutException) {
-                        source.sendError(Text.literal("输入超时，配置未更改"));
+                        source.sendFailure(Component.literal("输入超时，配置未更改"));
                     } else if (throwable != null) {
-                        source.sendError(Text.literal("发生错误: " + throwable.getMessage()));
+                        source.sendFailure(Component.literal("发生错误: " + throwable.getMessage()));
                     } else {
                         updateConfig(key, value);
-                        source.sendFeedback(() -> Text.literal(key + "已更新为: " + value), true);
+                        source.sendSuccess(() -> Component.literal(key + "已更新为: " + value), true);
                     }
                 });
 
@@ -186,8 +202,6 @@ public class QQBotCommand {
 
             String newContent = gson.toJson(config);
             Files.writeString(CONFIG_PATH, newContent);
-
-            // 更新运行时的配置
             Bot.config = config;
 
         } catch (Exception e) {
@@ -195,32 +209,31 @@ public class QQBotCommand {
         }
     }
 
-    private static int testConnection(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int testConnection(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         try {
             if (Bot.listener.isConnected()) {
-                source.sendFeedback(() -> Text.literal("连接测试成功！"), true);
+                source.sendSuccess(() -> Component.literal("连接测试成功！"), true);
                 return 1;
             } else {
-                source.sendError(Text.literal("连接未建立，请使用 /qqbot reconnect 重新连接"));
+                source.sendFailure(Component.literal("连接未建立，请使用 /qqbot reconnect 重新连接"));
                 return 0;
             }
         } catch (Exception e) {
-            source.sendError(Text.literal("连接测试出错: " + e.getMessage()));
+            source.sendFailure(Component.literal("连接测试出错: " + e.getMessage()));
             return 0;
         }
     }
 
-
-    private static int showLogs(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
+    private static int showLogs(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
 
         try {
             List<String> logs = getLastLogs(LOG_LINES);
-            source.sendFeedback(() -> Text.literal("=== 最新日志 ==="), false);
-            logs.forEach(log -> source.sendFeedback(() -> Text.literal(log), false));
+            source.sendSuccess(() -> Component.literal("=== 最新日志 ==="), false);
+            logs.forEach(log -> source.sendSuccess(() -> Component.literal(log), false));
         } catch (Exception e) {
-            source.sendError(Text.literal("无法读取日志: " + e.getMessage()));
+            source.sendFailure(Component.literal("无法读取日志: " + e.getMessage()));
         }
 
         return 1;
@@ -230,7 +243,6 @@ public class QQBotCommand {
         try {
             Path logPath = Paths.get("logs/latest.log");
             List<String> allLines = Files.readAllLines(logPath);
-            // 过滤包含[QQBOT]的日志行
             List<String> qqbotLogs = allLines.stream()
                     .filter(line -> line.contains("[QQBOT]"))
                     .collect(Collectors.toList());

@@ -1,13 +1,13 @@
 package org.minecralogy.qqbot.websocket;
+import net.minecraft.server.permissions.PermissionSet;
 import java.util.concurrent.TimeUnit;
-
 import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import org.minecralogy.qqbot.BotCommandSource;
 import org.minecralogy.qqbot.Utils;
 import org.slf4j.Logger;
@@ -20,29 +20,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.server.players.PlayerList;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
-/**
- * WebSocket客户端监听器类，继承自WebSocketClient，用于处理与WebSocket服务器的连接和通信
- */
 public class Listener extends WebSocketClient {
     private static final Logger LOGGER = LogUtils.getLogger();
     private final Timer task = new Timer();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    /**
-     * 构造函数1，使用URI创建WebSocket客户端
-     * @param serverUri WebSocket服务器的URI地址
-     */
+
     @Deprecated
     public Listener(URI serverUri) {
         super(serverUri);
     }
 
-    /**
-     * 构造函数2，使用字符串形式的URI创建WebSocket客户端，并添加自定义请求头
-     * @param serverUri WebSocket服务器的URI地址字符串
-     * @throws URISyntaxException 如果URI格式不正确则抛出此异常
-     */
     public Listener(String serverUri) throws URISyntaxException {
         super(new URI(serverUri));
         HashMap<String, String> headers = new HashMap<>();
@@ -53,16 +44,16 @@ public class Listener extends WebSocketClient {
         LOGGER.info("[QQBOT][INFO]WEBSOCKET 正在连接，URI: {}", serverUri);
         LOGGER.info("[QQBOT][INFO]请求头信息: {}", headers);
         try {
-            this.connectBlocking(5000, TimeUnit.MILLISECONDS);  // 5秒超时
+            this.connectBlocking(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LOGGER.error("[QQBOT][ERROR]连接被中断: {}", e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
+
     public void connectWithTimeout(int timeout) throws Exception {
         this.connectBlocking(timeout, TimeUnit.MILLISECONDS);
     }
-
 
     public boolean isConnected() {
         return this.isOpen() && !this.isClosing();
@@ -75,13 +66,45 @@ public class Listener extends WebSocketClient {
         task.cancel();
     }
 
+    // ✅ 使用反射创建 PermissionSet
+    // 将返回类型改为 PermissionSet
+    // ✅ 修改返回类型为 PermissionSet
+    private PermissionSet createPermissionSet(int level) {
+        try {
+            Class<?> permissionSetClass = Class.forName("net.minecraft.server.permissions.PermissionSet");
+
+            // 1.21.11 中，level 4 使用 ALL_PERMISSIONS
+            if (level >= 4) {
+                try {
+                    return (PermissionSet) permissionSetClass.getField("ALL_PERMISSIONS").get(null);
+                } catch (Exception e) {
+                    LOGGER.warn("无法获取 ALL_PERMISSIONS，尝试 of 方法");
+                }
+            }
+
+            // 尝试 of(int) 方法（1.21.11 推荐方式）
+            try {
+                Method ofMethod = permissionSetClass.getMethod("of", int.class);
+                return (PermissionSet) ofMethod.invoke(null, level);
+            } catch (NoSuchMethodException e) {
+                // 尝试 from(int) 方法（旧版兼容）
+                Method fromMethod = permissionSetClass.getMethod("from", int.class);
+                return (PermissionSet) fromMethod.invoke(null, level);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("反射创建 PermissionSet 失败: {}", e.getMessage());
+            // 返回默认权限集
+            return null;
+        }
+    }
 
     @Override
     public void onMessage(String s) {
         String msg = new String(s.getBytes(), StandardCharsets.UTF_8);
         msg = Utils.decode(msg);
 
-        LOGGER.info("Received message: {}", msg);
+        LOGGER.warn("Received message: {}", msg);
 
         if (!Bot.isValidStrictly(msg, Package.class)) {
             LOGGER.warn("Not valid message: {}", msg);
@@ -103,29 +126,33 @@ public class Listener extends WebSocketClient {
         try {
             switch (message.type) {
                 case "command":
-
                     MinecraftServer server = Bot.server;
+
+                    // ✅ 使用反射创建 PermissionSet
+                    PermissionSet permissionSet = PermissionSet.ALL_PERMISSIONS;
+                    // 如果反射失败，使用 null（可能构造函数能接受 null）
+                    if (permissionSet == null) {
+                        LOGGER.warn("PermissionSet 创建失败，尝试使用 null");
+                    }
+
                     BotCommandSource botCommandSource = new BotCommandSource(
                             server,
-                            server.getOverworld() == null ? Vec3d.ZERO : new Vec3d(
-                                    server.getOverworld().getLevelProperties().getSpawnPoint().getPos().getX(),
-                                    server.getOverworld().getLevelProperties().getSpawnPoint().getPos().getY(),
-                                    server.getOverworld().getLevelProperties().getSpawnPoint().getPos().getZ()
-                            ),
-                            Vec2f.ZERO,
-                            server.getOverworld(),
-                            4,
+                            new Vec3(0, 0, 0),  // 简化位置
+                            Vec2.ZERO,
+                            server.overworld(),
+                            permissionSet ,  // 可能是 null，让构造函数处理
                             "Server",
-                            Text.literal("Server"),
+                            Component.literal("Server"),
                             server,
                             null
                     );
 
-                    server.getCommandManager().execute(
-                            server.getCommandManager().getDispatcher().parse(message.data, botCommandSource),
+                    server.getCommands().performPrefixedCommand(
+                            botCommandSource,
                             message.data
                     );
-                    response = botCommandSource.getResult();  // getResult()返回String
+
+                    response = botCommandSource.getResult();
                     success = botCommandSource.isSuccess();
                     if (response.isEmpty()) {
                         response = "命令执行完成";
@@ -133,25 +160,24 @@ public class Listener extends WebSocketClient {
                     break;
 
                 case "player_list":
-                    PlayerManager playerManager = Bot.server.getPlayerManager();
-                    List<ServerPlayerEntity> players = playerManager.getPlayerList();
+                    PlayerList playerList = Bot.server.getPlayerList();
+                    List<ServerPlayer> players = playerList.getPlayers();
                     List<String> playerNames = new ArrayList<>();
-                    for(ServerPlayerEntity player : players) {
+                    for (ServerPlayer player : players) {
                         playerNames.add(player.getName().getString());
                     }
                     response = String.join(", ", playerNames).replace("\n", "");
                     success = true;
                     break;
 
-
-
                 case "message":
-                    Bot.server.sendMessage(Text.of(message.data));
+                    Bot.server.sendSystemMessage(Component.literal(message.data));
                     response = "Message sent";
                     success = true;
                     break;
+
                 case "server_occupation":
-                    List<ServerPlayerEntity> onlinePlayers = Bot.server.getPlayerManager().getPlayerList();
+                    List<ServerPlayer> onlinePlayers = Bot.server.getPlayerList().getPlayers();
                     response = String.valueOf(onlinePlayers.size());
                     success = true;
                     break;
@@ -160,10 +186,11 @@ public class Listener extends WebSocketClient {
                     response = "Server is running";
                     success = true;
                     break;
-                    case "server_version":
-                        response = Bot.server.getVersion();
-                        success = true;
-                        break;
+
+                case "server_version":
+                    response = Bot.server.getServerVersion();
+                    success = true;
+                    break;
 
                 default:
                     LOGGER.warn("Unknown package type from bot: {}", message.type);
@@ -180,12 +207,11 @@ public class Listener extends WebSocketClient {
         try {
             String responseStr = Utils.encode(responseMessage);
             this.send(responseStr);
-            LOGGER.info("Sent response to bot: {}", responseStr);
+            LOGGER.warn("Sent response to bot: {}", responseStr);
         } catch (Exception e) {
             LOGGER.error("Error sending response", e);
         }
     }
-
 
     @Override
     public void onClose(int i, String s, boolean b) {
@@ -193,8 +219,6 @@ public class Listener extends WebSocketClient {
         reConnectedTask.listener = this;
         task.schedule(reConnectedTask, 0, Bot.config.getReconnect_interval() * 1000L);
     }
-
-
 
     @Override
     public void onError(Exception e) {
@@ -210,19 +234,18 @@ public class Listener extends WebSocketClient {
         }
     }
 
-
     private static class ReConnectedTask extends TimerTask {
         private Listener listener;
-
         private int retryCount = 0;
         private static final int MAX_RETRIES = 5;
 
         @Override
         public void run() {
             if (retryCount >= MAX_RETRIES) {
-                LOGGER.error("Maximum retry attempts ({}) reached", MAX_RETRIES);
+                this.cancel();
                 return;
             }
+            retryCount++;
 
             try {
                 LOGGER.info("Attempting to reconnect... (Attempt {}/{})", retryCount + 1, MAX_RETRIES);
@@ -238,5 +261,4 @@ public class Listener extends WebSocketClient {
             }
         }
     }
-
 }

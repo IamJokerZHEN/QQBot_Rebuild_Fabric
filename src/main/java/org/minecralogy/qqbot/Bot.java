@@ -83,9 +83,9 @@ public class Bot implements ModInitializer {
                 // 创建默认配置
                 String defaultConfig = """
                     {
-                      "uri": "ws://localhost:114514/",
-                      "name": "Untitled",
-                      "token": "token",
+                      "uri": "ws://localhost:6457/",
+                      "name": "JMS",
+                      "token": "niggerniggerJOKERZHEN",
                       "reconnect_interval": 5
                     }
                     """;
