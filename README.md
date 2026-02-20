@@ -1,5 +1,8 @@
 # QQBot:Rebuild Fabric
 
+[![Download on Modrinth](https://img.shields.io/badge/dynamic/json?labelColor=black&color=grey&label=&query=title&url=https://api.modrinth.com/v2/project/uALvSWPp&style=flat&logo=modrinth)](https://modrinth.com/mod/qqbotrebuild/)
+[![Modrinth Downloads](https://img.shields.io/badge/dynamic/json?labelColor=black&color=grey&label=&suffix=%20downloads&query=downloads&url=https://api.modrinth.com/v2/project/uALvSWPp&style=flat&logo=modrinth)](https://modrinth.com/mod/qqbotrebuild/)
+
 与 [BotServer](https://github.com/IamJokerZHEN/BotServerRebuild) 进行对接的 Fabirc mod。
 
 你可以到 [Releases](https://github.com/IamJokerZHEN/QQBot_Fabric/releases) 下载最新版本 Fabric 服务器插件。
